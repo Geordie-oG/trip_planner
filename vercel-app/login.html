@@ -1,2 +1,13 @@
-<main class="login"><span class="tag">TWO TICKETS · VIETNAM</span><h1>Your trip for two</h1><p>Sign in with the email invited to your trip.</p><button id="google" class="primary">Continue with Google</button><form id="email-login"><label for="address">Email address</label><input id="address" type="email" autocomplete="email" placeholder="you@gmail.com" required><button>Send sign-in link</button></form><p id="message" role="status"></p><button id="switch" hidden>Sign out</button></main>
-<a id="current-planner" hidden href="https://two-tickets-vietnam-journal.excellentjam1.chatgpt.site">Open the current trip planner</a>
+<div class="account-stage"><main class="access-card account-surface">
+<div class="wordmark"><span class="brand-mark" aria-hidden="true">✈</span> Two Tickets</div>
+<h1 id="auth-title">Welcome back</h1><p id="auth-copy">Pick up where you and your travel partner left off.</p>
+<form id="email-login">
+<label for="address" id="email-label">Email</label><input id="address" type="email" autocomplete="email" placeholder="you@gmail.com" required>
+<div id="password-label"><label for="password">Password</label><button type="button" id="forgot" class="text-button">Forgot password?</button></div>
+<input type="password" id="password" autocomplete="current-password" placeholder="Enter your password" required>
+<button class="bright" id="submit-auth">Log in</button></form>
+<div id="alternatives"><div class="divider"><span>or</span></div><button id="google" class="outline"><b aria-hidden="true">G</b> Continue with Google</button>
+<button id="magic" class="text-button secondary-link">Email me a sign-in link</button></div>
+<div class="account-footer"><span id="mode-label">New here?</span> <button class="text-button" id="change-mode">Create an account</button></div>
+<p id="message" role="status"></p><a id="current-planner" hidden href="https://two-tickets-vietnam-journal.excellentjam1.chatgpt.site">Open current planner ↗</a>
+<button class="outline" id="switch" hidden>Log out</button></main></div>
