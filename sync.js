@@ -84,3 +84,28 @@
   setInterval(()=>{if(!document.hidden)synchronize()},4000);
   synchronize();
 })();
+
+// Account identity comes from the private site's sign-in gateway.
+(async function displayAccount() {
+  const panel = document.createElement('details');
+  const title = document.createElement('summary');
+  title.textContent = 'My account';
+  const email = document.createElement('p');
+  const login = document.createElement('a');
+  login.target = '_top';
+  panel.append(title, email, login);
+  document.querySelector('#sync-message').after(panel);
+  panel.style.marginBottom = '1rem';
+  try {
+    const response = await fetch('/api/account', {cache:'no-store'});
+    if (!response.ok) throw Error();
+    const account = await response.json();
+    email.textContent = 'Signed in as ' + account.email;
+    login.href = '/signout-with-chatgpt?return_to=%2F';
+    login.textContent = 'Sign out';
+  } catch {
+    email.textContent = 'Choose Continue with Google on the ChatGPT sign-in page to use your Gmail account.';
+    login.href = '/signin-with-chatgpt?return_to=%2F';
+    login.textContent = 'Sign in or create an account';
+  }
+})();

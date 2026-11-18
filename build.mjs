@@ -7,6 +7,10 @@ files['/index.html']=files['/index.html'].replace('<div id="content">','<p id="s
 let worker=readFileSync('worker/api.mjs','utf8')+'\nconst files='+JSON.stringify(files)+';\n';
 worker+=`export default {async fetch(request,env){
   const path=new URL(request.url).pathname;
+  if(path==='/api/account'){
+    const email=request.headers.get('oai-authenticated-user-email');
+    return Response.json({email},{status:email?200:401,headers:{'Cache-Control':'private, no-store'}});
+  }
   if(path==='/api/trip')return tripApi(request,env.BUCKET);
   const key=path==='/'?'/index.html':path;
   if(!Object.hasOwn(files,key))return new Response(null,{status:404});
