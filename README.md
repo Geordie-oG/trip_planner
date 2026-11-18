@@ -45,3 +45,7 @@ The Vercel build uses Supabase Auth, Postgres and private Storage. Run `npm ci`,
 2. Set SUPABASE_URL and SUPABASE_PUBLISHABLE_KEY in Vercel for Production and redeploy. Use the browser publishable key only.
 3. Set the Supabase Auth Site URL and allowed redirect URL to your Vercel production origin. Enable email authentication and configure email delivery for both travelers. For Continue with Google, enable the Google provider with your own Google web OAuth client and register Supabase's callback URI in Google Cloud.
 4. Sign in with each invited account and try an edit on both devices. Sign out using the button beside the account email. The Vercel version uses its own database. To transfer an existing itinerary, export a backup from the previous planner and import it after login. Re-upload screenshots to the new private store before relying on the Vercel version for confirmations.
+
+## Cloudflare Pages deployment
+
+Select this GitHub repository and the main branch in Pages, choose the build command `npm run build` and publish `vercel-dist`. Configure SUPABASE_URL and SUPABASE_PUBLISHABLE_KEY as build variables. Use the production Pages URL for the Supabase Auth Site URL and redirect allowlist. The membership, sign-in and private image storage setup above applies to both hosting providers. The build also generates Pages response headers from the Vercel configuration.
