@@ -15,7 +15,7 @@ function valid(s){return s&&typeof s.date==='string'&&Number.isFinite(s.budget)&
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const money=n=>'฿'+Number(n).toLocaleString('en-US',{maximumFractionDigits:2});
 const spent=()=>state.expenses.reduce((a,e)=>a+e.amount,0);
-function save(){try{localStorage.setItem(KEY,JSON.stringify(state));document.querySelector('#save-status').textContent='● Saved on this device'}catch(e){document.querySelector('#save-status').textContent='⚠ Not saved — export a backup';toast('Storage unavailable or full. Export a backup to keep changes.')}}
+function save(){window.dispatchEvent(new Event("trip-edit"));try{localStorage.setItem(KEY,JSON.stringify(state));document.querySelector('#save-status').textContent='● Saved on this device'}catch(e){document.querySelector('#save-status').textContent='⚠ Not saved — export a backup';toast('Storage unavailable or full. Export a backup to keep changes.')}}
 function toast(t){const el=document.querySelector('#toast');el.textContent=t;el.style.display='block';clearTimeout(toast.timer);toast.timer=setTimeout(()=>el.style.display='none',3500)}
 function dateFor(i){if(!state.date)return 'DAY '+(i+1);const d=new Date(state.date+'T12:00:00');d.setDate(d.getDate()+i);return d.toLocaleDateString('en-GB',{day:'numeric',month:'short'})}
 function updateTripHeader(){document.querySelector('#trip-date').value=state.date;const today=new Date();today.setHours(0,0,0,0);const diff=Math.round((new Date(state.date+'T00:00:00')-today)/86400000);document.querySelector('#countdown').textContent=!state.date?"Whenever we're ready ✨":diff>0?diff+' days to go ♡':diff>=-5?'Adventure time ♡':'A trip to remember ♡'}
