@@ -36,3 +36,12 @@ All itinerary times and the initial budget are planning examples, not confirmed 
 The private hosted planner stores one trip JSON document in a Cloudflare R2 binding named BUCKET. The first device initializes it from its browser copy. Authorized visitors share the same trip. The client checks for updates every four seconds while visible and saves after edits. Conditional writes prevent stale updates. Separate field edits merge. If two people change the same field concurrently, the shared value is retained and the other device offers its local draft under Download device copy. Changes to a note from the other device appear after you leave the note field.
 
 Run `node build.mjs` to produce the Worker at `dist/server/index.js`. The hosted Worker requires site-level access control covering both the page and API. The root static HTML and GitHub Pages edition continue to use browser storage. Only the Worker deployment provides shared editing.
+
+## Vercel deployment
+
+The Vercel build uses Supabase Auth, Postgres and private Storage. Run `npm ci`, `npm test` and `npm run build`. Import this repository on Vercel. The output directory and build command are in vercel.json.
+
+1. Use a dedicated Supabase project and run vercel-app/schema.sql. In the SQL editor insert each invited email into trip_private.members(email), lowercase. Only verified accounts in that table can read or edit the trip and its booking images.
+2. Set SUPABASE_URL and SUPABASE_PUBLISHABLE_KEY in Vercel for Production and redeploy. Use the browser publishable key only.
+3. Set the Supabase Auth Site URL and allowed redirect URL to your Vercel production origin. Enable email authentication and configure email delivery for both travelers. For Continue with Google, enable the Google provider with your own Google web OAuth client and register Supabase's callback URI in Google Cloud.
+4. Sign in with each invited account and try an edit on both devices. Sign out using the button beside the account email. The Vercel version uses its own database. To transfer an existing itinerary, export a backup from the previous planner and import it after login. Re-upload screenshots to the new private store before relying on the Vercel version for confirmations.
