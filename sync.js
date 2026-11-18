@@ -11,6 +11,7 @@
   function merge(before, local, remote) {
     if (equal(before,local) || equal(local,remote)) return remote;
     if (equal(before,remote)) return local;
+    if (before===undefined && Array.isArray(local) && Array.isArray(remote)) before=[];
     if (Array.isArray(before) && Array.isArray(local) && Array.isArray(remote)) {
       if ([...before,...local,...remote].every(item=>item && item.id)) {
         const maps = [before,local,remote].map(list=>new Map(list.map(item=>[item.id,item])));
@@ -20,7 +21,7 @@
       return before.map((item,i)=>merge(item,local[i],remote[i]));
     }
     if ([before,local,remote].every(value=>value && typeof value==='object')) {
-      return Object.fromEntries(Object.keys(before).map(key=>[key,merge(before[key],local[key],remote[key])]));
+      return Object.fromEntries([...new Set([...Object.keys(before),...Object.keys(local),...Object.keys(remote)])].map(key=>[key,merge(before[key],local[key],remote[key])]));
     }
     throw new Error('conflict');
   }
@@ -109,3 +110,39 @@
     login.textContent = 'Sign in or create an account';
   }
 })();
+
+window.bookingScreenshots = function (booking) {
+  const images = (booking.images || []).map(image => {
+    const url='/api/booking-images/'+encodeURIComponent(image.id);
+    return '<figure><a target="_blank" rel="noopener" href="'+esc(url)+'"><img loading="lazy" src="'+esc(url)+'" alt="'+esc(image.name)+'"></a><figcaption>'+esc(image.name)+'</figcaption><button type="button" data-unlink="'+esc(image.id)+'" data-booking="'+esc(booking.id)+'">Remove</button></figure>';
+  }).join('');
+  return '<section class="booking-images"><label>Confirmation screenshots <input type="file" multiple accept="image/png,image/jpeg,image/webp" data-upload="'+esc(booking.id)+'"></label><small>PNG, JPEG or WebP · up to 10 MB each</small><div class="booking-gallery">'+images+'</div></section>';
+};
+document.querySelector('#content').addEventListener('change',async event=>{
+  const field=event.target;if(!field.matches('[data-upload]'))return;
+  const bookingId=field.dataset.upload;
+  const files=Array.from(field.files);field.disabled=true;
+  let added=0;const failed=[];
+  for(const file of files){
+    try{
+      if(file.size>10*1024*1024)throw Error('over 10 MB');
+      if(!['image/png','image/jpeg','image/webp'].includes(file.type))throw Error('unsupported format');
+      const response=await fetch('/api/booking-images',{method:'POST',headers:{'Content-Type':file.type},body:file});
+      if(!response.ok)throw Error('upload failed');
+      const {id}=await response.json();
+      const booking=state.bookings.find(b=>b.id===bookingId);
+      if(!booking)throw Error('booking removed');
+      (booking.images??=[]).push({id,name:file.name});
+      save();added++;
+    }catch(error){failed.push(file.name+' ('+error.message+')');}
+  }
+  render();toast(failed.length?'Uploaded '+added+'. Could not add: '+failed.join(', '):'Screenshots added: '+added);
+});
+document.querySelector('#content').addEventListener('click',event=>{
+  const button=event.target.closest('[data-unlink]');if(!button)return;
+  const booking=state.bookings.find(b=>b.id===button.dataset.booking);
+  if(booking && confirm('Remove this screenshot from the booking?')){
+    booking.images=booking.images.filter(image=>image.id!==button.dataset.unlink);
+    save();render();
+  }
+});
